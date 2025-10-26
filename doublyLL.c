@@ -1,17 +1,22 @@
-#include <iostream>
-using namespace std;
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
 
 struct node {
     int data;
-    node* next;
-    node* prev;
+    struct node* next;
+    struct node* prev;
 };
 
-node* head = NULL;
+struct node* head = NULL;
 
 // Create a new node
-node* createNode(int value) {
-    node* newnode = new node();
+struct node* createNode(int value) {
+    struct node* newnode = (struct node*)malloc(sizeof(struct node));
+    if (!newnode) {
+        printf("Memory allocation failed!\n");
+        exit(1);
+    }
     newnode->data = value;
     newnode->next = NULL;
     newnode->prev = NULL;
@@ -20,7 +25,7 @@ node* createNode(int value) {
 
 // Insert at beginning
 void insertAtBeg(int value) {
-    node* newnode = createNode(value);
+    struct node* newnode = createNode(value);
     if (head == NULL) {
         head = newnode;
     } else {
@@ -28,163 +33,150 @@ void insertAtBeg(int value) {
         head->prev = newnode;
         head = newnode;
     }
-    cout << "Inserted " << value << " at beginning\n";
+    printf("Inserted %d at beginning\n", value);
 }
 
 // Insert at end
 void insertAtEnd(int value) {
-    node* newnode = createNode(value);
+    struct node* newnode = createNode(value);
     if (head == NULL) {
         head = newnode;
     } else {
-        node* temp = head;
+        struct node* temp = head;
         while (temp->next != NULL)
             temp = temp->next;
         temp->next = newnode;
         newnode->prev = temp;
     }
-    cout << "Inserted " << value << " at end\n";
+    printf("Inserted %d at end\n", value);
 }
 
 // Insert after a node with given key
 void insertAfterKey(int key, int value) {
-    node* temp = head;
+    struct node* temp = head;
     while (temp != NULL && temp->data != key)
         temp = temp->next;
     if (temp == NULL) {
-        cout << "Node with value " << key << " not found!\n";
+        printf("Node with value %d not found!\n", key);
         return;
     }
-    node* newnode = createNode(value);
+    struct node* newnode = createNode(value);
     newnode->next = temp->next;
     newnode->prev = temp;
     if (temp->next != NULL)
         temp->next->prev = newnode;
     temp->next = newnode;
-    cout << "Inserted " << value << " after " << key << "\n";
+    printf("Inserted %d after %d\n", value, key);
 }
 
 // Insert before a node with given key
 void insertBeforeKey(int key, int value) {
     if (head == NULL) {
-        cout << "List empty, cannot insert before " << key << "\n";
+        printf("List empty, cannot insert before %d\n", key);
         return;
     }
-    node* temp = head;
-    // If head is the key node
     if (head->data == key) {
         insertAtBeg(value);
         return;
     }
+
+    struct node* temp = head;
     while (temp != NULL && temp->data != key)
         temp = temp->next;
     if (temp == NULL) {
-        cout << "Node with value " << key << " not found!\n";
+        printf("Node with value %d not found!\n", key);
         return;
     }
-    node* newnode = createNode(value);
+
+    struct node* newnode = createNode(value);
     newnode->prev = temp->prev;
     newnode->next = temp;
     temp->prev->next = newnode;
     temp->prev = newnode;
-    cout << "Inserted " << value << " before " << key << "\n";
+    printf("Inserted %d before %d\n", value, key);
 }
 
 // Insert at specific position (1-based index)
 void insertAtPosition(int pos, int value) {
     if (pos <= 0) {
-        cout << "Position should be >= 1\n";
+        printf("Position should be >= 1\n");
         return;
     }
     if (pos == 1) {
         insertAtBeg(value);
         return;
     }
-    node* temp = head;
+
+    struct node* temp = head;
     int count = 1;
     while (temp != NULL && count < pos - 1) {
         temp = temp->next;
         count++;
     }
+
     if (temp == NULL) {
-        cout << "Position " << pos << " out of bounds, inserting at end\n";
+        printf("Position %d out of bounds, inserting at end\n", pos);
         insertAtEnd(value);
         return;
     }
-    node* newnode = createNode(value);
+
+    struct node* newnode = createNode(value);
     newnode->next = temp->next;
     newnode->prev = temp;
     if (temp->next != NULL)
         temp->next->prev = newnode;
     temp->next = newnode;
-    cout << "Inserted " << value << " at position " << pos << "\n";
-}
-
-// Insert before specific position (i.e. at pos-1)
-void insertBeforePosition(int pos, int value) {
-    if (pos <= 1) {
-        insertAtBeg(value);
-        return;
-    }
-    insertAtPosition(pos - 1, value);
-}
-
-// Insert after specific position (i.e. at pos+1)
-void insertAfterPosition(int pos, int value) {
-    if (pos < 1) {
-        cout << "Invalid position\n";
-        return;
-    }
-    insertAtPosition(pos + 1, value);
+    printf("Inserted %d at position %d\n", value, pos);
 }
 
 // Delete at beginning
 void deleteAtBeg() {
     if (head == NULL) {
-        cout << "List is empty, nothing to delete\n";
+        printf("List is empty, nothing to delete\n");
         return;
     }
-    node* temp = head;
+    struct node* temp = head;
     head = head->next;
     if (head != NULL)
         head->prev = NULL;
-    cout << "Deleted node with value " << temp->data << " at beginning\n";
-    delete temp;
+    printf("Deleted node with value %d at beginning\n", temp->data);
+    free(temp);
 }
 
 // Delete at end
 void deleteAtEnd() {
     if (head == NULL) {
-        cout << "List is empty, nothing to delete\n";
+        printf("List is empty, nothing to delete\n");
         return;
     }
-    node* temp = head;
-    if (temp->next == NULL) { // Only one node
-        cout << "Deleted node with value " << temp->data << " at end\n";
-        delete temp;
+    struct node* temp = head;
+    if (temp->next == NULL) {
+        printf("Deleted node with value %d at end\n", temp->data);
+        free(temp);
         head = NULL;
         return;
     }
     while (temp->next != NULL)
         temp = temp->next;
+    printf("Deleted node with value %d at end\n", temp->data);
     temp->prev->next = NULL;
-    cout << "Deleted node with value " << temp->data << " at end\n";
-    delete temp;
+    free(temp);
 }
 
 // Delete node with given key
 void deleteKey(int key) {
     if (head == NULL) {
-        cout << "List is empty, nothing to delete\n";
+        printf("List is empty, nothing to delete\n");
         return;
     }
-    node* temp = head;
+    struct node* temp = head;
     while (temp != NULL && temp->data != key)
         temp = temp->next;
     if (temp == NULL) {
-        cout << "Node with value " << key << " not found!\n";
+        printf("Node with value %d not found!\n", key);
         return;
     }
+
     if (temp == head) {
         deleteAtBeg();
         return;
@@ -193,27 +185,28 @@ void deleteKey(int key) {
         deleteAtEnd();
         return;
     }
+
     temp->prev->next = temp->next;
     temp->next->prev = temp->prev;
-    cout << "Deleted node with value " << key << "\n";
-    delete temp;
+    printf("Deleted node with value %d\n", key);
+    free(temp);
 }
 
 // Delete before key
 void deleteBeforeKey(int key) {
     if (head == NULL || head->next == NULL) {
-        cout << "Not enough nodes to delete before " << key << "\n";
+        printf("Not enough nodes to delete before %d\n", key);
         return;
     }
-    node* temp = head;
+    struct node* temp = head;
     while (temp != NULL && temp->data != key)
         temp = temp->next;
     if (temp == NULL) {
-        cout << "Node with value " << key << " not found!\n";
+        printf("Node with value %d not found!\n", key);
         return;
     }
     if (temp->prev == NULL) {
-        cout << "No node exists before " << key << "\n";
+        printf("No node exists before %d\n", key);
         return;
     }
     deleteKey(temp->prev->data);
@@ -221,15 +214,15 @@ void deleteBeforeKey(int key) {
 
 // Delete after key
 void deleteAfterKey(int key) {
-    node* temp = head;
+    struct node* temp = head;
     while (temp != NULL && temp->data != key)
         temp = temp->next;
     if (temp == NULL) {
-        cout << "Node with value " << key << " not found!\n";
+        printf("Node with value %d not found!\n", key);
         return;
     }
     if (temp->next == NULL) {
-        cout << "No node exists after " << key << "\n";
+        printf("No node exists after %d\n", key);
         return;
     }
     deleteKey(temp->next->data);
@@ -238,42 +231,41 @@ void deleteAfterKey(int key) {
 // Delete at given position (1-based)
 void deleteAtPosition(int pos) {
     if (pos <= 0) {
-        cout << "Position should be >= 1\n";
+        printf("Position should be >= 1\n");
         return;
     }
     if (head == NULL) {
-        cout << "List empty, nothing to delete\n";
+        printf("List empty, nothing to delete\n");
         return;
     }
     if (pos == 1) {
         deleteAtBeg();
         return;
     }
-    node* temp = head;
+
+    struct node* temp = head;
     int count = 1;
-    while (temp != NULL && count < pos)
-    {
+    while (temp != NULL && count < pos) {
         temp = temp->next;
         count++;
     }
     if (temp == NULL) {
-        cout << "Position " << pos << " out of bounds\n";
+        printf("Position %d out of bounds\n", pos);
         return;
     }
     if (temp->next == NULL) {
-        // last node
         deleteAtEnd();
         return;
     }
     temp->prev->next = temp->next;
     temp->next->prev = temp->prev;
-    cout << "Deleted node at position " << pos << " with value " << temp->data << "\n";
-    delete temp;
+    printf("Deleted node at position %d with value %d\n", pos, temp->data);
+    free(temp);
 }
 
 // Search node with value
 bool search(int value) {
-    node* temp = head;
+    struct node* temp = head;
     while (temp != NULL) {
         if (temp->data == value)
             return true;
@@ -285,45 +277,45 @@ bool search(int value) {
 // Print list forward
 void printForward() {
     if (head == NULL) {
-        cout << "List is empty\n";
+        printf("List is empty\n");
         return;
     }
-    cout << "List (forward): ";
-    node* temp = head;
+    printf("List (forward): ");
+    struct node* temp = head;
     while (temp != NULL) {
-        cout << temp->data << " <-> ";
+        printf("%d <-> ", temp->data);
         temp = temp->next;
     }
-    cout << "NULL\n";
+    printf("NULL\n");
 }
 
 // Print list backward
 void printBackward() {
     if (head == NULL) {
-        cout << "List is empty\n";
+        printf("List is empty\n");
         return;
     }
-    node* temp = head;
+    struct node* temp = head;
     while (temp->next != NULL)
         temp = temp->next;
-    cout << "List (backward): ";
+    printf("List (backward): ");
     while (temp != NULL) {
-        cout << temp->data << " <-> ";
+        printf("%d <-> ", temp->data);
         temp = temp->prev;
     }
-    cout << "NULL\n";
+    printf("NULL\n");
 }
 
-// Clear entire list to avoid memory leaks
+// Clear entire list
 void clearList() {
-    node* temp = head;
+    struct node* temp = head;
     while (temp != NULL) {
-        node* nextNode = temp->next;
-        delete temp;
+        struct node* nextNode = temp->next;
+        free(temp);
         temp = nextNode;
     }
     head = NULL;
-    cout << "Cleared the list\n";
+    printf("Cleared the list\n");
 }
 
 // Main function for testing
@@ -337,7 +329,7 @@ int main() {
     printForward();
     printBackward();
 
-    cout << "\nDeleting some nodes:\n";
+    printf("\nDeleting some nodes:\n");
     deleteAtBeg();
     deleteAtEnd();
     deleteBeforeKey(10);
@@ -345,11 +337,10 @@ int main() {
     deleteAtPosition(3);
     printForward();
 
-    cout << "\nSearch tests:\n";
-    cout << "Is 10 in list? " << (search(10) ? "Yes" : "No") << "\n";
-    cout << "Is 100 in list? " << (search(100) ? "Yes" : "No") << "\n";
+    printf("\nSearch tests:\n");
+    printf("Is 10 in list? %s\n", search(10) ? "Yes" : "No");
+    printf("Is 100 in list? %s\n", search(100) ? "Yes" : "No");
 
     clearList();
-
     return 0;
 }
