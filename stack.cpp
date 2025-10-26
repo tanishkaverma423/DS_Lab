@@ -1,64 +1,73 @@
-#include <bits/stdc++.h>
-using namespace std;
-
+#include <stdio.h>
 #define MAX 100
 
-class Stack {
+// Stack structure
+struct Stack {
     int arr[MAX];
     int top;
-
-public:
-    Stack() {
-        top = -1;
-    }
-
-    void push(int x) {
-        if (top >= MAX - 1) {
-            cout << "Stack overflow\n";
-        } else {
-            arr[++top] = x; // FIXED: actually assign x to arr[top]
-            cout << x << " pushed into stack\n";
-        }
-    }
-
-    void pop() {
-        if (top < 0) {
-            cout << "Stack underflow\n";
-        } else {
-            cout << arr[top--] << " popped out from the stack\n"; // FIXED: added space and newline
-        }
-    }
-
-    int peek() {
-        if (top < 0) {
-            cout << "Stack underflow\n";
-            return -1;
-        } else {
-            return arr[top];
-        }
-    }
-
-    void display() {
-        if (top < 0) {
-            cout << "Stack is Empty\n";
-            return;
-        }
-        cout << "Stack elements: ";
-        for (int i = 0; i <= top; i++) {
-            cout << arr[i] << " ";
-        }
-        cout << endl;
-    }
 };
 
+// Initialize stack
+void initStack(struct Stack *s) {
+    s->top = -1;
+}
+
+// Push operation
+void push(struct Stack *s, int x) {
+    if (s->top >= MAX - 1) {
+        printf("Stack overflow\n");
+    } else {
+        s->arr[++(s->top)] = x;
+        printf("%d pushed into stack\n", x);
+    }
+}
+
+// Pop operation
+void pop(struct Stack *s) {
+    if (s->top < 0) {
+        printf("Stack underflow\n");
+    } else {
+        printf("%d popped out from the stack\n", s->arr[s->top--]);
+    }
+}
+
+// Peek operation
+int peek(struct Stack *s) {
+    if (s->top < 0) {
+        printf("Stack underflow\n");
+        return -1;
+    } else {
+        return s->arr[s->top];
+    }
+}
+
+// Display all elements
+void display(struct Stack *s) {
+    if (s->top < 0) {
+        printf("Stack is Empty\n");
+        return;
+    }
+    printf("Stack elements: ");
+    for (int i = 0; i <= s->top; i++) {
+        printf("%d ", s->arr[i]);
+    }
+    printf("\n");
+}
+
+// Main function
 int main() {
-    Stack s;
-    s.push(10);
-    s.push(20);
-    s.push(30);
-    s.display();
-    cout << "Top element is " << s.peek() << endl;
-    s.pop();
-    s.display();
+    struct Stack s;
+    initStack(&s);
+
+    push(&s, 10);
+    push(&s, 20);
+    push(&s, 30);
+    display(&s);
+
+    printf("Top element is %d\n", peek(&s));
+
+    pop(&s);
+    display(&s);
+
     return 0;
 }
